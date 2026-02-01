@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Dọn rác bảo vệ biển</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #4facfe;
+    overflow: hidden;
+}
+
+h1 {
+    text-align: center;
+    color: white;
+    margin: 10px 0;
+}
+
+#game {
+    position: relative;
+    width: 100vw;
+    height: calc(100vh - 60px);
+    background: url("wave.gif") repeat-x bottom,
+                linear-gradient(#4facfe 65%, #f4d03f 65%);
+}
+
+.trash {
+    position: absolute;
+    width: 70px;
+    cursor: pointer;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0); }
+}
+
+#bin {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    width: 120px;
+}
+
+#questionBox {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+#questionContent {
+    background: white;
+    padding: 20px;
+    width: 320px;
+    border-radius: 10px;
+}
+
+#questionContent button {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+<h1>🌊 DỌN RÁC BẢO VỆ MÔI TRƯỜNG BIỂN ♻️</h1>
+
+<div id="game">
+    <img src="trash.png" class="trash" style="top:200px; left:120px">
+    <img src="trash.png" class="trash" style="top:320px; left:350px">
+    <img src="trash.png" class="trash" style="top:180px; left:550px">
+
+    <img id="bin" src="bin.png">
+</div>
+
+<div id="questionBox">
+    <div id="questionContent">
+        <p id="question"></p>
+        <div id="answers"></div>
+    </div>
+</div>
+
+<script>
+let questions = [];
+let currentTrash = null;
+
+// Load JSON
+fetch("questions.json")
+    .then(res => res.json())
+    .then(data => questions = data);
+
+// Gắn sự kiện click cho rác
+document.querySelectorAll(".trash").forEach(trash => {
+    trash.addEventListener("click", () => openQuestion(trash));
+});
+
+function openQuestion(trash) {
+    currentTrash = trash;
+    const q = questions[Math.floor(Math.random() * questions.length)];
+
+    document.getElementById("question").innerText = q.question;
+    const answersDiv = document.getElementById("answers");
+    answersDiv.innerHTML = "";
+
+    q.answers.forEach((ans, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = ans;
+        btn.onclick = () => checkAnswer(i === q.correct);
+        answersDiv.appendChild(btn);
+    });
+
+    document.getElementById("questionBox").style.display = "flex";
+}
+
+function checkAnswer(correct) {
+    document.getElementById("questionBox").style.display = "none";
+
+    if (correct) {
+        const bin = document.getElementById("bin");
+
+        currentTrash.style.transition = "all 0.8s ease-in";
+        currentTrash.style.left = bin.offsetLeft + "px";
+        currentTrash.style.top = bin.offsetTop + "px";
+        currentTrash.style.transform = "scale(0.3) rotate(360deg)";
+
+        setTimeout(() => currentTrash.remove(), 800);
+    } else {
+        alert("❌ Trả lời chưa đúng, hãy suy nghĩ lại nhé!");
+    }
+}
+</script>
+
+</body>
+</html>

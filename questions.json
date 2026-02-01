@@ -1,0 +1,29 @@
+[
+  {
+    "question": "Hành động nào giúp bảo vệ môi trường biển?",
+    "answers": [
+      "Xả rác xuống biển",
+      "Thu gom rác thải",
+      "Đổ dầu ra biển"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Rác thải nhựa gây tác hại gì?",
+    "answers": [
+      "Giúp cá khỏe hơn",
+      "Gây ô nhiễm và làm chết sinh vật biển",
+      "Không ảnh hưởng gì"
+    ],
+    "correct": 1
+  },
+  {
+    "question": "Khi đi du lịch biển, bạn nên làm gì?",
+    "answers": [
+      "Mang rác về đúng nơi quy định",
+      "Chôn rác xuống cát",
+      "Ném rác xuống nước"
+    ],
+    "correct": 0
+  }
+]

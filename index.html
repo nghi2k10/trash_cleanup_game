@@ -18,7 +18,7 @@ h1 {
     margin: 10px 0;
 }
 
-/* Khu vực game */
+/* Game area */
 #game {
     position: relative;
     width: 100vw;
@@ -27,12 +27,84 @@ h1 {
                 linear-gradient(#4facfe 65%, #f4d03f 65%);
 }
 
-/* Rác */
+#sun {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 120px;
+    pointer-events: none;
+}
+
+/* Chung cho mây */
+.cloud {
+    position: absolute;
+    top: 40px;
+    left: -300px;
+    pointer-events: none;
+    animation-name: cloudMove;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+}
+
+/* 🌥️ Mây xa – nhỏ, mờ, trôi chậm */
+.cloud-far {
+    top: 50px;
+    width: 120px;
+    opacity: 0.4;
+    animation-duration: 120s;
+}
+
+/* ☁️ Mây trung – vừa */
+.cloud-mid {
+    top: 10px;
+    width: 180px;
+    opacity: 0.65;
+    animation-duration: 80s;
+}
+
+/* 🌤️ Mây gần – to, rõ, trôi nhanh */
+.cloud-near {
+    top: 30px;
+    width: 100px;
+    opacity: 0.9;
+    animation-duration: 50s;
+}
+
+/* Hiệu ứng trôi + lắc nhẹ */
+@keyframes cloudMove {
+    0% {
+        transform: translateX(0) translateY(0);
+    }
+    50% {
+        transform: translateX(50vw) translateY(-12px);
+    }
+    100% {
+        transform: translateX(calc(100vw + 600px)) translateY(0);
+    }
+}
+
+
+/* Hiệu ứng mây trôi */
+@keyframes cloudMove {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(100vw + 300px));
+    }
+}
+
+/* Trash */
 .trash {
     position: absolute;
     width: 70px;
     cursor: pointer;
     animation: float 3s ease-in-out infinite;
+}
+
+.trash.disabled {
+    pointer-events: none;
+    opacity: 0.6;
 }
 
 @keyframes float {
@@ -41,7 +113,7 @@ h1 {
     100% { transform: translateY(0); }
 }
 
-/* Người nhặt rác */
+/* Collector */
 #collector {
     position: absolute;
     bottom: 20px;
@@ -61,7 +133,7 @@ h1 {
     100% { transform: rotate(0); }
 }
 
-/* Thùng rác */
+/* Bin */
 #bin {
     position: absolute;
     right: 20px;
@@ -69,30 +141,78 @@ h1 {
     width: 120px;
 }
 
-/* Hộp câu hỏi */
+/* Question box */
 #questionBox {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.55);
     display: none;
     justify-content: center;
     align-items: center;
+    z-index: 10;
 }
 
 #questionContent {
+    background: linear-gradient(#ffffff, #f2f9ff);
+    padding: 25px;
+    width: 340px;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    animation: pop 0.4s ease;
+}
+
+#question {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+#answers button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    font-size: 15px;
+    cursor: pointer;
+    background: #e3f2fd;
+    transition: 0.2s;
+}
+
+#answers button:hover {
+    background: #bbdefb;
+}
+
+@keyframes pop {
+    0% { transform: scale(0.7); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* Win screen */
+#winScreen {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+}
+
+.winBox {
     background: white;
-    padding: 20px;
-    width: 320px;
-    border-radius: 10px;
+    padding: 30px;
+    border-radius: 15px;
     text-align: center;
 }
 
-#questionContent button {
-    width: 100%;
-    margin-top: 8px;
-    padding: 8px;
+.winBox button {
+    margin-top: 15px;
+    padding: 10px 20px;
     cursor: pointer;
 }
+
 </style>
 </head>
 
@@ -102,20 +222,23 @@ h1 {
 
 <div id="game">
 
-    <!-- Rác -->
-    <img src="trash.png" class="trash" style="top:200px; left:120px">
-    <img src="trash.png" class="trash" style="top:320px; left:350px">
-    <img src="trash.png" class="trash" style="top:180px; left:550px">
+    <img id="sun" src="sun.png">
 
-    <!-- Người nhặt rác -->
+    <!-- Clouds -->
+    <img src="clouds.png" class="cloud cloud-far">
+    <img src="clouds.png" class="cloud cloud-mid">
+    <img src="clouds.png" class="cloud cloud-near">
+
+    <img src="trash.png"  class="trash" style="top:200px; left:120px">
+    <img src="bottle.png" class="trash" style="top:320px; left:350px">
+    <img src="stink.png"  class="trash" style="top:180px; left:550px">
+
     <img id="collector" src="collector.png">
-
-    <!-- Thùng rác -->
     <img id="bin" src="bin.png">
-
+    
 </div>
 
-<!-- Câu hỏi -->
+<!-- Question -->
 <div id="questionBox">
     <div id="questionContent">
         <p id="question"></p>
@@ -123,23 +246,49 @@ h1 {
     </div>
 </div>
 
+<!-- Win -->
+<div id="winScreen">
+    <div class="winBox">
+        <h2>🎉 CHÚC MỪNG 🎉</h2>
+        <p>Bạn đã dọn sạch rác và bảo vệ biển xanh 💙</p>
+        <button onclick="location.reload()">Chơi lại</button>
+    </div>
+</div>
+
+<!-- Sounds -->
+<audio id="soundCorrect" src="correct.mp3"></audio>
+<audio id="soundWrong" src="wrong.mp3"></audio>
+
 <script>
 let questions = [];
 let currentTrash = null;
+let trashCount = document.querySelectorAll(".trash").length;
+let isBusy = false;
 
-// Load câu hỏi
+// Load questions (1 trash = 1 question)
 fetch("questions.json")
     .then(res => res.json())
-    .then(data => questions = data);
+    .then(data => {
+        questions = [...data];
 
-// Click vào rác
+        document.querySelectorAll(".trash").forEach(trash => {
+            const i = Math.floor(Math.random() * questions.length);
+            trash.dataset.question = JSON.stringify(questions[i]);
+            questions.splice(i, 1);
+        });
+    });
+
+// Click trash
 document.querySelectorAll(".trash").forEach(trash => {
-    trash.addEventListener("click", () => openQuestion(trash));
+    trash.addEventListener("click", () => {
+        if (isBusy) return;
+        openQuestion(trash);
+    });
 });
 
 function openQuestion(trash) {
     currentTrash = trash;
-    const q = questions[Math.floor(Math.random() * questions.length)];
+    const q = JSON.parse(trash.dataset.question);
 
     document.getElementById("question").innerText = q.question;
     const answersDiv = document.getElementById("answers");
@@ -159,22 +308,24 @@ function checkAnswer(correct) {
     document.getElementById("questionBox").style.display = "none";
 
     if (!correct) {
-        alert("❌ Trả lời chưa đúng, hãy suy nghĩ lại nhé!");
+        document.getElementById("soundWrong").play();
+        alert("❌ Trả lời chưa đúng, hãy thử lại!");
         return;
     }
 
+    document.getElementById("soundCorrect").play();
+    isBusy = true;
+    currentTrash.classList.add("disabled");
+
     const collector = document.getElementById("collector");
     const bin = document.getElementById("bin");
-
     const trashX = currentTrash.offsetLeft;
     const trashY = currentTrash.offsetTop;
 
-    // 1️⃣ Người chạy tới rác
     collector.style.left = trashX - 40 + "px";
     collector.style.top = trashY - 40 + "px";
 
     setTimeout(() => {
-        // 2️⃣ Nhặt rác
         collector.classList.add("pick");
 
         currentTrash.style.transition = "all 0.5s ease";
@@ -182,7 +333,6 @@ function checkAnswer(correct) {
         currentTrash.style.top = trashY + 20 + "px";
         currentTrash.style.transform = "scale(0.5)";
 
-        // 3️⃣ Chạy tới thùng
         setTimeout(() => {
             collector.classList.remove("pick");
 
@@ -193,11 +343,17 @@ function checkAnswer(correct) {
             currentTrash.style.top = bin.offsetTop + 20 + "px";
             currentTrash.style.transform = "scale(0.2) rotate(360deg)";
 
-            // 4️⃣ Bỏ rác xong
-            setTimeout(() => currentTrash.remove(), 600);
+            setTimeout(() => {
+                currentTrash.remove();
+                trashCount--;
+                isBusy = false;
+
+                if (trashCount === 0) {
+                    document.getElementById("winScreen").style.display = "flex";
+                }
+            }, 600);
 
         }, 600);
-
     }, 1000);
 }
 </script>

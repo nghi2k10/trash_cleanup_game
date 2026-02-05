@@ -18,6 +18,7 @@ h1 {
     margin: 10px 0;
 }
 
+/* Khu vực game */
 #game {
     position: relative;
     width: 100vw;
@@ -26,6 +27,7 @@ h1 {
                 linear-gradient(#4facfe 65%, #f4d03f 65%);
 }
 
+/* Rác */
 .trash {
     position: absolute;
     width: 70px;
@@ -39,6 +41,27 @@ h1 {
     100% { transform: translateY(0); }
 }
 
+/* Người nhặt rác */
+#collector {
+    position: absolute;
+    bottom: 20px;
+    left: 40px;
+    width: 100px;
+    transition: all 1s ease;
+    z-index: 5;
+}
+
+.pick {
+    animation: pickUp 0.5s ease;
+}
+
+@keyframes pickUp {
+    0% { transform: rotate(0); }
+    50% { transform: rotate(-15deg); }
+    100% { transform: rotate(0); }
+}
+
+/* Thùng rác */
 #bin {
     position: absolute;
     right: 20px;
@@ -46,6 +69,7 @@ h1 {
     width: 120px;
 }
 
+/* Hộp câu hỏi */
 #questionBox {
     position: fixed;
     inset: 0;
@@ -60,6 +84,7 @@ h1 {
     padding: 20px;
     width: 320px;
     border-radius: 10px;
+    text-align: center;
 }
 
 #questionContent button {
@@ -72,16 +97,25 @@ h1 {
 </head>
 
 <body>
+
 <h1>🌊 DỌN RÁC BẢO VỆ MÔI TRƯỜNG BIỂN ♻️</h1>
 
 <div id="game">
+
+    <!-- Rác -->
     <img src="trash.png" class="trash" style="top:200px; left:120px">
     <img src="trash.png" class="trash" style="top:320px; left:350px">
     <img src="trash.png" class="trash" style="top:180px; left:550px">
 
+    <!-- Người nhặt rác -->
+    <img id="collector" src="collector.png">
+
+    <!-- Thùng rác -->
     <img id="bin" src="bin.png">
+
 </div>
 
+<!-- Câu hỏi -->
 <div id="questionBox">
     <div id="questionContent">
         <p id="question"></p>
@@ -93,12 +127,12 @@ h1 {
 let questions = [];
 let currentTrash = null;
 
-// Load JSON
+// Load câu hỏi
 fetch("questions.json")
     .then(res => res.json())
     .then(data => questions = data);
 
-// Gắn sự kiện click cho rác
+// Click vào rác
 document.querySelectorAll(".trash").forEach(trash => {
     trash.addEventListener("click", () => openQuestion(trash));
 });
@@ -124,18 +158,47 @@ function openQuestion(trash) {
 function checkAnswer(correct) {
     document.getElementById("questionBox").style.display = "none";
 
-    if (correct) {
-        const bin = document.getElementById("bin");
-
-        currentTrash.style.transition = "all 0.8s ease-in";
-        currentTrash.style.left = bin.offsetLeft + "px";
-        currentTrash.style.top = bin.offsetTop + "px";
-        currentTrash.style.transform = "scale(0.3) rotate(360deg)";
-
-        setTimeout(() => currentTrash.remove(), 800);
-    } else {
+    if (!correct) {
         alert("❌ Trả lời chưa đúng, hãy suy nghĩ lại nhé!");
+        return;
     }
+
+    const collector = document.getElementById("collector");
+    const bin = document.getElementById("bin");
+
+    const trashX = currentTrash.offsetLeft;
+    const trashY = currentTrash.offsetTop;
+
+    // 1️⃣ Người chạy tới rác
+    collector.style.left = trashX - 40 + "px";
+    collector.style.top = trashY - 40 + "px";
+
+    setTimeout(() => {
+        // 2️⃣ Nhặt rác
+        collector.classList.add("pick");
+
+        currentTrash.style.transition = "all 0.5s ease";
+        currentTrash.style.left = trashX + 30 + "px";
+        currentTrash.style.top = trashY + 20 + "px";
+        currentTrash.style.transform = "scale(0.5)";
+
+        // 3️⃣ Chạy tới thùng
+        setTimeout(() => {
+            collector.classList.remove("pick");
+
+            collector.style.left = bin.offsetLeft - 60 + "px";
+            collector.style.top = bin.offsetTop - 60 + "px";
+
+            currentTrash.style.left = bin.offsetLeft + 20 + "px";
+            currentTrash.style.top = bin.offsetTop + 20 + "px";
+            currentTrash.style.transform = "scale(0.2) rotate(360deg)";
+
+            // 4️⃣ Bỏ rác xong
+            setTimeout(() => currentTrash.remove(), 600);
+
+        }, 600);
+
+    }, 1000);
 }
 </script>
 
